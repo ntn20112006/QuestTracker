@@ -50,6 +50,10 @@ android {
 }
 
 dependencies {
+    // Jetpack Compose Navigation (BOM keeps versions in sync)
+    implementation(platform(libs.androidx.compose.bom.v20250401))
+    implementation(libs.androidx.navigation.compose)
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
