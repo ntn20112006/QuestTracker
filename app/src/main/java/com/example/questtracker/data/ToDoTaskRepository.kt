@@ -9,6 +9,10 @@ class ToDoTaskRepository(private val dao: ToDoTaskDao) {
 
     suspend fun add(task: ToDoTask) = dao.insert(task)
 
+    suspend fun delete(task: ToDoTask) = dao.delete(task)
+
+    suspend fun update(task: ToDoTask) = dao.update(task)
+
     suspend fun toggle(id: Int) {
         val task = dao.getById(id) ?: return
         dao.update(task.copy(isComplete = !task.isComplete))

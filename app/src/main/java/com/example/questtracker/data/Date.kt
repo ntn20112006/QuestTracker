@@ -1,7 +1,7 @@
 package com.example.questtracker.data
 
 data class Date (
-    var day: Int,
     var month: Int,
+    var day: Int,
     var year: Int
 )
