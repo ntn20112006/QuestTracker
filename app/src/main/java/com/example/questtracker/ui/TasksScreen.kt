@@ -29,17 +29,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.questtracker.data.ToDoTask
+import com.example.questtracker.QuestTrackerApp
+import com.example.questtracker.data.ToDoTaskRepository
+import com.example.questtracker.data.entity.ToDoTask
 import com.example.questtracker.viewmodels.ToDoTasksViewModel
+import com.example.questtracker.viewmodels.ToDoTasksViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TasksScreen(
-    viewModel: ToDoTasksViewModel = viewModel()
-) {
+fun TasksScreen(app: QuestTrackerApp = LocalContext.current.applicationContext as QuestTrackerApp) {
+    val repository = remember { ToDoTaskRepository(app.database.toDoTaskDao()) }
+    val factory = remember { ToDoTasksViewModelFactory(repository) }
+    val viewModel: ToDoTasksViewModel = viewModel(factory = factory)
     val tasks by viewModel.tasks.collectAsState()
 
     var showDialog by remember { mutableStateOf(false) }

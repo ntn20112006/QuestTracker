@@ -1,31 +1,37 @@
 package com.example.questtracker.viewmodels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.questtracker.data.Date
-import com.example.questtracker.data.ToDoTask
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.example.questtracker.data.ToDoTaskRepository
+import com.example.questtracker.data.entity.ToDoTask
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
-class ToDoTasksViewModel : ViewModel() {
-    private val _tasks = MutableStateFlow(
-        listOf(
-            ToDoTask(1, "Walk 1 km", "", false, 2, Date(1, 1, 1), false, null),
-            ToDoTask(2, "Read 10 pages", "", false, 2, Date(1, 1, 1), true, null),
-            ToDoTask(3, "Meditate 5 min", "", false, 2, Date(1, 1, 1), false, null)
-        )
-    )
-    val tasks: StateFlow<List<ToDoTask>> = _tasks.asStateFlow()
+class ToDoTasksViewModel(
+    private val repository: ToDoTaskRepository
+) : ViewModel() {
+    val tasks: StateFlow<List<ToDoTask>> =
+        repository.tasks.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun toggle(id: Int) {
-        _tasks.update { list ->
-            list.map { if (it.id == id.toInt()) it.copy(isComplete = !it.isComplete) else it }
-        }
+        viewModelScope.launch { repository.toggle(id) }
     }
 
     fun add(title: String) {
-        val nextId = (_tasks.value.maxOfOrNull { it.id } ?: 0) + 1
-        _tasks.update { it + ToDoTask(nextId, title, "", false, 2, Date(1, 1, 1), false, null) }
+        viewModelScope.launch {
+            repository.add(
+                ToDoTask(
+                    title = title,
+                    description = "",
+                    isRecurring = false,
+                    recurrenceInterval = 2,
+                    deadline = Date(1, 1, 1),
+                    isComplete = false,
+                )
+            )
+        }
     }
 }
