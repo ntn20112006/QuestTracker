@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.compose.compiler)
+//    id("com.google.devtools.ksp")
 }
 
 android {
@@ -51,13 +53,12 @@ android {
 
 dependencies {
     // Jetpack Compose Navigation (BOM keeps versions in sync)
-    implementation(libs.androidx.compose.bom.v20240500)
+    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.activity.compose)
     implementation(libs.material3)
     implementation(libs.ui.tooling.preview)
     debugImplementation(libs.ui.tooling)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
