@@ -20,44 +20,41 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.questtracker.QuestTrackerApp
-import com.example.questtracker.data.repository.ToDoTaskRepository
-import com.example.questtracker.data.entity.ToDoTask
 import com.example.questtracker.data.Date
-import com.example.questtracker.viewmodels.ToDoTasksViewModel
-import com.example.questtracker.viewmodels.ToDoTasksViewModelFactory
+import com.example.questtracker.data.entity.Goal
+import com.example.questtracker.data.repository.GoalRepository
+import com.example.questtracker.viewmodels.GoalViewModel
+import com.example.questtracker.viewmodels.GoalViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TasksScreen(
+fun GoalsScreen(
     app: QuestTrackerApp = LocalContext.current.applicationContext as QuestTrackerApp
 ) {
-    val repo       = remember { ToDoTaskRepository(app.database.toDoTaskDao()) }
-    val factory    = remember { ToDoTasksViewModelFactory(repo) }
-    val viewModel: ToDoTasksViewModel = viewModel(factory = factory)
-    val tasks by viewModel.tasks.collectAsState()
+    val repo = remember { GoalRepository(app.database.goalDao()) }
+    val factory = remember { GoalViewModelFactory(repo) }
+    val viewModel: GoalViewModel = viewModel(factory = factory)
+    val goals by viewModel.goals.collectAsState()
 
     var showAddDialog by remember { mutableStateOf(false) }
-    var editTask by remember { mutableStateOf<ToDoTask?>(null) }
-    var deleteTask by remember { mutableStateOf<ToDoTask?>(null) }
+    var editGoal by remember { mutableStateOf<Goal?>(null) }
+    var deleteGoal by remember { mutableStateOf<Goal?>(null) }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Tasks") }) },
+        topBar = { TopAppBar(title = { Text("Goals") }) },
         floatingActionButton = {
             FloatingActionButton(onClick = { showAddDialog = true }) {
-                Icon(Icons.Default.Add, contentDescription = "Add Task")
+                Icon(Icons.Default.Add, contentDescription = "Add Goal")
             }
         }
     ) { padding ->
-        LazyColumn(
-            contentPadding = padding,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            items(tasks, key = { it.id }) { task ->
-                TaskCard(
-                    task = task,
-                    onToggle = { viewModel.toggle(task.id) },
-                    onEdit = { editTask = it },
-                    onDelete = { deleteTask = it }
+        LazyColumn(contentPadding = padding, modifier = Modifier.fillMaxSize()) {
+            items(goals, key = { it.id }) { goal ->
+                GoalCard(
+                    goal = goal,
+                    onToggle = { viewModel.toggle(goal.id) },
+                    onEdit = { editGoal = it },
+                    onDelete = { deleteGoal = it }
                 )
             }
         }
@@ -74,41 +71,41 @@ fun TasksScreen(
         )
     }
 
-    editTask?.let { orig ->
+    editGoal?.let { orig ->
         GoalDialog(
             initial = orig,
-            onSubmit = { updated ->
-                viewModel.update(updated)
-                editTask = null
+            onSubmit = {
+                viewModel.update(it)
+                editGoal = null
             },
-            onDismiss = { editTask = null }
+            onDismiss = { editGoal = null }
         )
     }
 
-    deleteTask?.let { toDelete ->
+    deleteGoal?.let { toDelete ->
         AlertDialog(
-            onDismissRequest = { deleteTask = null },
-            title = { Text("Delete task?") },
+            onDismissRequest = { deleteGoal = null },
+            title = { Text("Delete goal?") },
             text = { Text("Are you sure you want to delete “${toDelete.title}”?") },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.delete(toDelete)
-                    deleteTask = null
+                    deleteGoal = null
                 }) { Text("Delete") }
             },
             dismissButton = {
-                TextButton(onClick = { deleteTask = null }) { Text("Cancel") }
+                TextButton(onClick = { deleteGoal = null }) { Text("Cancel") }
             }
         )
     }
 }
 
 @Composable
-private fun TaskCard(
-    task: ToDoTask,
+private fun GoalCard(
+    goal: Goal,
     onToggle: () -> Unit,
-    onEdit: (ToDoTask) -> Unit,
-    onDelete: (ToDoTask) -> Unit
+    onEdit: (Goal) -> Unit,
+    onDelete: (Goal) -> Unit
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
 
@@ -126,9 +123,9 @@ private fun TaskCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = task.title,
+                    text = goal.title,
                     style = MaterialTheme.typography.bodyMedium,
-                    textDecoration = if (task.isComplete) TextDecoration.LineThrough else null,
+                    textDecoration = if (goal.isComplete) TextDecoration.LineThrough else null,
                     modifier = Modifier
                         .background(
                             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
@@ -141,9 +138,9 @@ private fun TaskCard(
 
                 Text(
                     text = "%02d-%02d-%04d".format(
-                        task.deadline.month,
-                        task.deadline.day,
-                        task.deadline.year
+                        goal.deadline.month,
+                        goal.deadline.day,
+                        goal.deadline.year
                     ),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier
@@ -168,14 +165,14 @@ private fun TaskCard(
                             text = { Text("Edit") },
                             onClick = {
                                 menuExpanded = false
-                                onEdit(task)
+                                onEdit(goal)
                             }
                         )
                         DropdownMenuItem(
                             text = { Text("Delete") },
                             onClick = {
                                 menuExpanded = false
-                                onDelete(task)
+                                onDelete(goal)
                             }
                         )
                     }
@@ -191,7 +188,7 @@ private fun TaskCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = task.description,
+                    text = goal.description,
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(12.dp)
                 )
@@ -203,8 +200,8 @@ private fun TaskCard(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun GoalDialog(
-    initial: ToDoTask?,
-    onSubmit: (ToDoTask) -> Unit,
+    initial: Goal?,
+    onSubmit: (Goal) -> Unit,
     onDismiss: () -> Unit
 ) {
     var title by remember { mutableStateOf(initial?.title.orEmpty()) }
@@ -216,14 +213,10 @@ private fun GoalDialog(
             }.orEmpty()
         )
     }
-    var isRecurring by remember { mutableStateOf(initial?.isRecurring ?: false) }
-    var recurrenceInterval by remember {
-        mutableStateOf(initial?.recurrenceInterval?.toString().orEmpty())
-    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(if (initial == null) "New Task" else "Edit Task") },
+        title = { Text(if (initial == null) "New Goal" else "Edit Goal") },
         text = {
             Column {
                 OutlinedTextField(
@@ -255,29 +248,6 @@ private fun GoalDialog(
                         .fillMaxWidth()
                         .height(100.dp)
                 )
-
-                Spacer(Modifier.height(8.dp))
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(
-                        checked = isRecurring,
-                        onCheckedChange = { isRecurring = it }
-                    )
-                    Spacer(Modifier.width(4.dp))
-                    Text("Repeat every X days")
-                }
-
-                if (isRecurring) {
-                    Spacer(Modifier.height(4.dp))
-                    OutlinedTextField(
-                        value = recurrenceInterval,
-                        onValueChange = { recurrenceInterval = it.filter(Char::isDigit) },
-                        label = { Text("Interval (days)") },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
             }
         },
         confirmButton = {
@@ -290,12 +260,10 @@ private fun GoalDialog(
                     val date = Date(m, d, y)
 
                     onSubmit(
-                        ToDoTask(
+                        Goal(
                             id = initial?.id ?: 0,
                             title = title.trim(),
                             description = description.trim(),
-                            isRecurring = isRecurring,
-                            recurrenceInterval = recurrenceInterval.toIntOrNull() ?: 1,
                             deadline = date,
                             isComplete = initial?.isComplete ?: false
                         )

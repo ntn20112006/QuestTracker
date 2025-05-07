@@ -2,20 +2,20 @@ package com.example.questtracker.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.questtracker.data.repository.ToDoTaskRepository
-import com.example.questtracker.data.entity.ToDoTask
+import com.example.questtracker.data.entity.Goal
+import com.example.questtracker.data.repository.GoalRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class ToDoTasksViewModel(
-    private val repository: ToDoTaskRepository
+class GoalViewModel(
+    private val repository: GoalRepository
 ) : ViewModel() {
 
     // expose the list of tasks
-    val tasks: StateFlow<List<ToDoTask>> =
-        repository.tasks
+    val goals: StateFlow<List<Goal>> =
+        repository.goals
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     // toggle complete/incomplete
@@ -26,23 +26,23 @@ class ToDoTasksViewModel(
     }
 
     // add a full ToDoTask
-    fun add(task: ToDoTask) {
+    fun add(goal: Goal) {
         viewModelScope.launch {
-            repository.add(task)
+            repository.add(goal)
         }
     }
 
     // (optional) delete a task
-    fun delete(task: ToDoTask) {
+    fun delete(goal: Goal) {
         viewModelScope.launch {
-            repository.delete(task)
+            repository.delete(goal)
         }
     }
 
     // (optional) update a task
-    fun update(task: ToDoTask) {
+    fun update(goal: Goal) {
         viewModelScope.launch {
-            repository.update(task)
+            repository.update(goal)
         }
     }
 }

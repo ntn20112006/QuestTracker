@@ -14,6 +14,6 @@ class QuestTrackerApp : Application() {
             applicationContext,
             AppDatabase::class.java,
             "questtracker-db"
-        ).build()
+        ).fallbackToDestructiveMigration(true).build()
     }
 }
