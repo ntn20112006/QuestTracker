@@ -26,6 +26,12 @@ import com.example.questtracker.data.repository.GoalRepository
 import com.example.questtracker.viewmodels.GoalViewModel
 import com.example.questtracker.viewmodels.GoalViewModelFactory
 
+/**
+ * Main screen for managing goals in the QuestTracker application.
+ * This screen displays a list of goals and provides functionality to add, edit, delete, and toggle goals.
+ *
+ * @param app The QuestTrackerApp instance, retrieved from the current context
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GoalsScreen(
@@ -86,7 +92,7 @@ fun GoalsScreen(
         AlertDialog(
             onDismissRequest = { deleteGoal = null },
             title = { Text("Delete goal?") },
-            text = { Text("Are you sure you want to delete “${toDelete.title}”?") },
+            text = { Text("Are you sure you want to delete ${toDelete.title}?") },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.delete(toDelete)
@@ -100,6 +106,14 @@ fun GoalsScreen(
     }
 }
 
+/**
+ * A card component that displays a single goal with its details and actions.
+ *
+ * @param goal The goal to display
+ * @param onToggle Callback when the goal's completion status is toggled
+ * @param onEdit Callback when the goal is edited
+ * @param onDelete Callback when the goal is deleted
+ */
 @Composable
 private fun GoalCard(
     goal: Goal,
@@ -197,6 +211,13 @@ private fun GoalCard(
     }
 }
 
+/**
+ * A dialog for adding or editing a goal.
+ *
+ * @param initial The initial goal data when editing, null when adding a new goal
+ * @param onSubmit Callback when the goal is submitted
+ * @param onDismiss Callback when the dialog is dismissed
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun GoalDialog(
