@@ -17,7 +17,7 @@ import com.example.questtracker.data.Date
  * @property isComplete Whether the task has been completed
  */
 @Entity(tableName = "todoTasks")
-data class ToDoTask(
+data class Task(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     var title: String,
     var description: String,

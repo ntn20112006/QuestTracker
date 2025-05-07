@@ -20,11 +20,11 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.questtracker.QuestTrackerApp
-import com.example.questtracker.data.repository.ToDoTaskRepository
-import com.example.questtracker.data.entity.ToDoTask
+import com.example.questtracker.data.repository.TaskRepository
+import com.example.questtracker.data.entity.Task
 import com.example.questtracker.data.Date
-import com.example.questtracker.viewmodels.ToDoTasksViewModel
-import com.example.questtracker.viewmodels.ToDoTasksViewModelFactory
+import com.example.questtracker.viewmodels.TaskViewModel
+import com.example.questtracker.viewmodels.TaskViewModelFactory
 
 /**
  * Main screen for managing tasks in the QuestTracker application.
@@ -35,17 +35,17 @@ import com.example.questtracker.viewmodels.ToDoTasksViewModelFactory
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TasksScreen(
+fun TaskScreen(
     app: QuestTrackerApp = LocalContext.current.applicationContext as QuestTrackerApp
 ) {
-    val repo       = remember { ToDoTaskRepository(app.database.toDoTaskDao()) }
-    val factory    = remember { ToDoTasksViewModelFactory(repo) }
-    val viewModel: ToDoTasksViewModel = viewModel(factory = factory)
+    val repo       = remember { TaskRepository(app.database.taskDao()) }
+    val factory    = remember { TaskViewModelFactory(repo) }
+    val viewModel: TaskViewModel = viewModel(factory = factory)
     val tasks by viewModel.tasks.collectAsState()
 
     var showAddDialog by remember { mutableStateOf(false) }
-    var editTask by remember { mutableStateOf<ToDoTask?>(null) }
-    var deleteTask by remember { mutableStateOf<ToDoTask?>(null) }
+    var editTask by remember { mutableStateOf<Task?>(null) }
+    var deleteTask by remember { mutableStateOf<Task?>(null) }
 
     Scaffold(
         topBar = { TopAppBar(title = { Text("Tasks") }) },
@@ -121,10 +121,10 @@ fun TasksScreen(
  */
 @Composable
 private fun TaskCard(
-    task: ToDoTask,
+    task: Task,
     onToggle: () -> Unit,
-    onEdit: (ToDoTask) -> Unit,
-    onDelete: (ToDoTask) -> Unit
+    onEdit: (Task) -> Unit,
+    onDelete: (Task) -> Unit
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
 
@@ -227,8 +227,8 @@ private fun TaskCard(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TaskDialog(
-    initial: ToDoTask?,
-    onSubmit: (ToDoTask) -> Unit,
+    initial: Task?,
+    onSubmit: (Task) -> Unit,
     onDismiss: () -> Unit
 ) {
     var title by remember { mutableStateOf(initial?.title.orEmpty()) }
@@ -314,7 +314,7 @@ private fun TaskDialog(
                     val date = Date(m, d, y)
 
                     onSubmit(
-                        ToDoTask(
+                        Task(
                             id = initial?.id ?: 0,
                             title = title.trim(),
                             description = description.trim(),

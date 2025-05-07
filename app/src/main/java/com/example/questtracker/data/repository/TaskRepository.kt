@@ -1,7 +1,7 @@
 package com.example.questtracker.data.repository
 
-import com.example.questtracker.data.DAO.ToDoTaskDao
-import com.example.questtracker.data.entity.ToDoTask
+import com.example.questtracker.data.DAO.TaskDao
+import com.example.questtracker.data.entity.Task
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -11,33 +11,33 @@ import kotlinx.coroutines.flow.Flow
  *
  * @property dao The Data Access Object for performing database operations on tasks
  */
-class ToDoTaskRepository(private val dao: ToDoTaskDao) {
+class TaskRepository(private val dao: TaskDao) {
     /**
      * Flow that emits the current list of tasks.
      * The list is updated whenever the underlying data changes.
      */
-    val tasks: Flow<List<ToDoTask>> = dao.getAll()
+    val tasks: Flow<List<Task>> = dao.getAll()
 
     /**
      * Adds a new task to the database.
      *
      * @param task The task to add
      */
-    suspend fun add(task: ToDoTask) = dao.insert(task)
+    suspend fun add(task: Task) = dao.insert(task)
 
     /**
      * Deletes a task from the database.
      *
      * @param task The task to delete
      */
-    suspend fun delete(task: ToDoTask) = dao.delete(task)
+    suspend fun delete(task: Task) = dao.delete(task)
 
     /**
      * Updates an existing task in the database.
      *
      * @param task The task to update
      */
-    suspend fun update(task: ToDoTask) = dao.update(task)
+    suspend fun update(task: Task) = dao.update(task)
 
     /**
      * Toggles the completion status of a task.

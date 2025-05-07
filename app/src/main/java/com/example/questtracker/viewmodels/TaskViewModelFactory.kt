@@ -2,7 +2,7 @@ package com.example.questtracker.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.questtracker.data.repository.ToDoTaskRepository
+import com.example.questtracker.data.repository.TaskRepository
 
 /**
  * Factory class for creating ToDoTasksViewModel instances.
@@ -10,8 +10,8 @@ import com.example.questtracker.data.repository.ToDoTaskRepository
  *
  * @property repository The repository instance to be passed to the ViewModel
  */
-class ToDoTasksViewModelFactory(
-    private val repository: ToDoTaskRepository
+class TaskViewModelFactory(
+    private val repository: TaskRepository
 ) : ViewModelProvider.Factory {
     /**
      * Creates a new instance of the specified ViewModel class.
@@ -22,8 +22,8 @@ class ToDoTasksViewModelFactory(
      */
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(ToDoTasksViewModel::class.java)) {
-            return ToDoTasksViewModel(repository) as T
+        if (modelClass.isAssignableFrom(TaskViewModel::class.java)) {
+            return TaskViewModel(repository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

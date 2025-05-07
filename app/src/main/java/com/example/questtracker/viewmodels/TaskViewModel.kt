@@ -2,8 +2,8 @@ package com.example.questtracker.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.questtracker.data.repository.ToDoTaskRepository
-import com.example.questtracker.data.entity.ToDoTask
+import com.example.questtracker.data.repository.TaskRepository
+import com.example.questtracker.data.entity.Task
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -15,15 +15,15 @@ import kotlinx.coroutines.launch
  *
  * @property repository The repository instance for accessing task data
  */
-class ToDoTasksViewModel(
-    private val repository: ToDoTaskRepository
+class TaskViewModel(
+    private val repository: TaskRepository
 ) : ViewModel() {
 
     /**
      * StateFlow that emits the current list of tasks.
      * The list is updated whenever the underlying data changes.
      */
-    val tasks: StateFlow<List<ToDoTask>> =
+    val tasks: StateFlow<List<Task>> =
         repository.tasks
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
@@ -43,7 +43,7 @@ class ToDoTasksViewModel(
      *
      * @param task The task to add
      */
-    fun add(task: ToDoTask) {
+    fun add(task: Task) {
         viewModelScope.launch {
             repository.add(task)
         }
@@ -54,7 +54,7 @@ class ToDoTasksViewModel(
      *
      * @param task The task to delete
      */
-    fun delete(task: ToDoTask) {
+    fun delete(task: Task) {
         viewModelScope.launch {
             repository.delete(task)
         }
@@ -65,7 +65,7 @@ class ToDoTasksViewModel(
      *
      * @param task The task to update
      */
-    fun update(task: ToDoTask) {
+    fun update(task: Task) {
         viewModelScope.launch {
             repository.update(task)
         }
