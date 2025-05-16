@@ -1,4 +1,4 @@
-package com.example.questtracker.ui
+package com.example.questtracker.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,6 +25,7 @@ import com.example.questtracker.data.entity.Task
 import com.example.questtracker.data.Date
 import com.example.questtracker.viewmodels.TaskViewModel
 import com.example.questtracker.viewmodels.TaskViewModelFactory
+import com.example.questtracker.ui.components.SearchBar
 
 /**
  * Main screen for managing tasks in the QuestTracker application.
@@ -42,10 +43,22 @@ fun TaskScreen(
     val factory    = remember { TaskViewModelFactory(repo) }
     val viewModel: TaskViewModel = viewModel(factory = factory)
     val tasks by viewModel.tasks.collectAsState()
+    var searchQuery by remember { mutableStateOf("") }
 
     var showAddDialog by remember { mutableStateOf(false) }
     var editTask by remember { mutableStateOf<Task?>(null) }
     var deleteTask by remember { mutableStateOf<Task?>(null) }
+
+    val filteredTasks = remember(tasks, searchQuery) {
+        if (searchQuery.isEmpty()) {
+            tasks
+        } else {
+            tasks.filter { task ->
+                task.title.contains(searchQuery, ignoreCase = true) ||
+                task.description.contains(searchQuery, ignoreCase = true)
+            }
+        }
+    }
 
     Scaffold(
         topBar = { TopAppBar(title = { Text("Tasks") }) },
@@ -55,17 +68,27 @@ fun TaskScreen(
             }
         }
     ) { padding ->
-        LazyColumn(
-            contentPadding = padding,
-            modifier = Modifier.fillMaxSize()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
         ) {
-            items(tasks, key = { it.id }) { task ->
-                TaskCard(
-                    task = task,
-                    onToggle = { viewModel.toggle(task.id) },
-                    onEdit = { editTask = it },
-                    onDelete = { deleteTask = it }
-                )
+            SearchBar(
+                query = searchQuery,
+                onQueryChange = { searchQuery = it }
+            )
+            
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(filteredTasks, key = { it.id }) { task ->
+                    TaskCard(
+                        task = task,
+                        onToggle = { viewModel.toggle(task.id) },
+                        onEdit = { editTask = it },
+                        onDelete = { deleteTask = it }
+                    )
+                }
             }
         }
     }

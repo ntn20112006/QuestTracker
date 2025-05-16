@@ -1,4 +1,4 @@
-package com.example.questtracker.ui
+package com.example.questtracker.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
